@@ -28,3 +28,4 @@
 .\output\para.o: .\UCOS_II\Source\os_cfg.h
 .\output\para.o: .\UCOS_II\Ports\os_cpu.h
 .\output\para.o: .\USER\Others\Inc\Queue.h
+.\output\para.o: USER\Communicate.h

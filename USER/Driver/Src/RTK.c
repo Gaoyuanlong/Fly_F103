@@ -131,6 +131,7 @@ void RTK_Extract_RmcData(const u8* BUF)
 	while(Str_Add_temp[i++] !=  ','){}
 	RTK_RMC.ModeInd = Str_Add_temp[i];
 }
+
 void RTK_Extract_GgaData(const u8* BUF)
 {
 	const u8* Str_Add_temp = BUF;
@@ -184,10 +185,10 @@ void RTK_Extract_GgaData(const u8* BUF)
 		RTK_GGA.StnID[3] = Str_Add_temp[i++];	
 	}
 }
-
+u8 BUF[128] = "GPRMC,125030.80,A,3853.1375121,N,12131.5780702,E,0.034,105.5,100117,0.0,E,D*3D";
 BOOL RTK_Read_GPRMC(void)
 {
-	u8 BUF[128] = "GPRMC,125030.80,A,3853.1375121,N,12131.5780702,E,0.034,105.5,100117,0.0,E,D*3D";
+
 	u8 Sum = 0;
 	u8 Length = 0;
 	
@@ -258,7 +259,7 @@ BOOL RTK_Read_GPGGA(void)
 */
 void RTK_Unit_Convert(void)
 {
-	#define EARTH_RADIUS 6371004
+	#define EARTH_RADIUS 6371393
 	#define PI 3.141592653
 	#define LAT0 0
 	#define LON0 0
@@ -288,6 +289,7 @@ void RTK_Unit_Convert(void)
 	
 	RTK_GPS.Quality = RTK_GGA.Quality-'0';						//定位质量	GGA
 	RTK_GPS.Speed_M = RTK_RMC.Speed;									//移动速度 单位米	RMC
+	
 }
 
 void RTK_Init(void)

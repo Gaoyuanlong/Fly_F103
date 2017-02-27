@@ -12,7 +12,7 @@ typedef struct Communicate_
 }Communicate_;
 
 extern Communicate_ Communicate;
-
+extern RTK_GPS_ GPS_Send_Data;
 #endif
 
 

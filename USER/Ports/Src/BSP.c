@@ -14,9 +14,9 @@ void BSP_Init(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);	
 	
 	Os_Time.Init();
-	Usart1.Init(115200,1);
+	Usart1.Init(115200,3);
 	Usart2.Init(115200,2);
-	Usart3.Init(115200,3);
+	Usart3.Init(9600,1);
 	ADC.Init(); 
 }
 

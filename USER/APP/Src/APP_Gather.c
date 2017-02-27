@@ -13,6 +13,8 @@ void Task_Gather(void *p_arg)
 		}
 		Para.Updata();
 		Para.Save();
-		OSTimeDly(100); 
+		OSTimeDly(100);  
 	}
 }
+
+
