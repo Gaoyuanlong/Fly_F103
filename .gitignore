@@ -89,3 +89,4 @@ OUTPUT/mpu9250.crf
 *.axf
 *.lst
 *.htm
+*.map

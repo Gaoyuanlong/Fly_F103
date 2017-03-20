@@ -3,22 +3,25 @@
 void USART2_Init(u32 Baud,u8 Priority);
 u8 USART2_Send(u8* BUF,u8 Cnt);
 u8 USART2_Recv(u8* BUF,u8 Offset,u8 Cnt,BOOL IsWait);
-
+void USART2_GetRight(void);
+void USART2_FreeRight(void);
 struct USART_ Usart2 = 
 {
 	USART2_Init,
 	USART2_Send,
 	USART2_Recv,
+	USART2_GetRight,
+	USART2_FreeRight
 };
-
-#define BUF_SIZE 240
 
 
 OS_EVENT* USART2_IsSendNoFull;
 OS_EVENT* USART2_IsRecvNoEmpty;
+OS_EVENT* USART2_IsIdel;
 
-u8 USART2_TX_BUF[BUF_SIZE];
-u8 USART2_RX_BUF[BUF_SIZE];
+
+u8 USART2_TX_BUF[USART_BUF_SIZE];
+u8 USART2_RX_BUF[USART_BUF_SIZE];
 
 
 Queue_ USART2_QueueSend;
@@ -67,53 +70,75 @@ void USART2_Init(u32 Baud,u8 Priority)
 
 	USART2_IsSendNoFull = OSSemCreate (0);
 	USART2_IsRecvNoEmpty = OSSemCreate (0);
+	u8 Err;
+	USART2_IsIdel =  OSMutexCreate(0,&Err);;
 	
-	USART2_QueueSend = Queue_OPS.Init(BUF_SIZE,USART2_TX_BUF);
-	USART2_QueueRecv = Queue_OPS.Init(BUF_SIZE,USART2_RX_BUF);
+	USART2_QueueSend = Queue_OPS.Init(USART_BUF_SIZE,USART2_TX_BUF);
+	USART2_QueueRecv = Queue_OPS.Init(USART_BUF_SIZE,USART2_RX_BUF);
 }
+//请求串口使用权
+void USART2_GetRight(void)
+{
+	u8 Err; 
+	OSMutexPend(USART2_IsIdel,0,&Err); //请求信号量
+}
+//释放串口使用权
+void USART2_FreeRight(void)
+{
+	OSMutexPost(USART2_IsIdel);		  	//发出信号量
+}
+
 // 写缓存,缓存满会阻塞
 u8 USART2_Send(u8* BUF,u8 Cnt)
 {
 	u8 Err; 
 	u8 i = 0;
-
-	for(i = 0;i < Cnt;i++)
+	
+	USART2_GetRight();
+	
+	while(i < Cnt)
 	{
-		if(USART2_QueueSend.IsFull == True)
+		if(Queue_OPS.Enqueue(BUF[i],&USART2_QueueSend) == False)
 		{
 			USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
-			OSSemPend(USART2_IsSendNoFull,0,&Err); //请求信号量
-			i--;
+			OSSemPend(USART2_IsSendNoFull,1000,&Err); //请求信号量,1S超时
+			if(Err == OS_ERR_TIMEOUT) break;
 		}
 		else
-		{
-			Queue_OPS.Enqueue(BUF[i],&USART2_QueueSend); //非满，写缓存
-		}
+			i++;
 	}
 		
 	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
-
+	USART2_FreeRight();
+	
 	return i;
 }
 // 读缓存,缓存空会阻塞
+
 u8 USART2_Recv(u8* BUF,u8 Offset,u8 Cnt,BOOL IsWait)
 {
 	u8 Err; 
-	u8 i = 0;
+	u8 i = Offset;
 	
-	if((IsWait == True) && (USART2_QueueRecv.IsEmpty == True)) OSSemPend(USART2_IsRecvNoEmpty,0,&Err); //请求信号量
-
-	for(i = Offset;i < Cnt;i++)
+	USART2_GetRight();
+	
+	while(i < Cnt)
 	{
 		if(Queue_OPS.Dequeue(&BUF[i],&USART2_QueueRecv) == False)
 		{
 			if(IsWait == True)
-				OSSemPend(USART2_IsRecvNoEmpty,0,&Err); //请求信号量
+			{
+				OSSemPend(USART2_IsRecvNoEmpty,1000,&Err); //请求信号量
+				if(Err == OS_ERR_TIMEOUT) break;
+			}
 			else
 				break;
 		}
-	}		
-
+		else
+			i++;
+	}
+		
+	USART2_FreeRight();
 	return i;
 }
 
@@ -130,7 +155,6 @@ void USART2_IRQHandler(void)
 	{  
 		USART_ReceiveData(USART2);   
 	}  
-	//send
 	if(USART_GetITStatus(USART2,USART_IT_TXE) == SET)
 	{
 		u8 Tmp = 0;
@@ -153,11 +177,14 @@ void USART2_IRQHandler(void)
 	if(USART_GetITStatus(USART2,USART_IT_RXNE) == SET)
 	{	
 		u8 Tmp = USART_ReceiveData(USART2);
-
-		if(USART2_QueueRecv.IsEmpty == True) OSSemPost(USART2_IsRecvNoEmpty);			//发出信号量
+		if(USART2_QueueRecv.IsEmpty == True)
+			
+					OSSemPost(USART2_IsRecvNoEmpty);			//发出信号量
 		Queue_OPS.Enqueue(Tmp,&USART2_QueueRecv);
 	} 	
 	
 	OSIntExit(); 
 }
+
+
 

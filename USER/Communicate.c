@@ -5,25 +5,34 @@ Communicate_ Communicate=
 {
 	UpData
 };
-RTK_GPS_ GPS_Send_Data;
+RTK_XYZ_HP_ RTK_XYZ_HP_SendData;
 
 void Send_Gps_MCU1(void)
 {
-	#define RTK_GPS_SIZE 48
-	#define GPS_HEAD_SIZE 3
+	#define RTK_GPS_SIZE 96
+	#define GPS_HEAD_SIZE 4
 	
 
-	u8 GPS_Head[GPS_HEAD_SIZE] = {'G','P','S'}; 
+	u8 GPS_Head[GPS_HEAD_SIZE] = {'G','P','S','A'}; 
+
+	RTK_XYZ_HP_SendData.PX = RTK_XYZ_HP.PX;
+	RTK_XYZ_HP_SendData.PY = RTK_XYZ_HP.PY;
+	RTK_XYZ_HP_SendData.PZ = RTK_XYZ_HP.PZ;
 	
-	GPS_Send_Data.Alt_M = RTK_GPS.Alt_M;
-	GPS_Send_Data.Lat_M = RTK_GPS.Lat_M;
-	GPS_Send_Data.Lon_M = RTK_GPS.Lon_M;
-	GPS_Send_Data.Quality = RTK_GPS.Quality;
-	GPS_Send_Data.Speed_M = RTK_GPS.Speed_M;
-	GPS_Send_Data.TrackAngle = RTK_GPS.TrackAngle;
+	RTK_XYZ_HP_SendData.VX = RTK_XYZ_HP.VX;
+	RTK_XYZ_HP_SendData.VY = RTK_XYZ_HP.VY;
+	RTK_XYZ_HP_SendData.VZ = RTK_XYZ_HP.VZ;
 	
+	RTK_XYZ_HP_SendData.Heading = RTK_XYZ_HP.Heading;
+	RTK_XYZ_HP_SendData.Pitch = RTK_XYZ_HP.Pitch;
+	
+	RTK_XYZ_HP_SendData.Lon_M = RTK_XYZ_HP.Lon_M;
+	RTK_XYZ_HP_SendData.Lat_M = RTK_XYZ_HP.Lat_M;
+	RTK_XYZ_HP_SendData.Alt_M = RTK_XYZ_HP.Alt_M;
+	RTK_XYZ_HP_SendData.Quality = RTK_XYZ_HP.Quality;
+
 	Usart3.Send(GPS_Head,GPS_HEAD_SIZE);
-	Usart3.Send((u8*)&GPS_Send_Data.Quality,RTK_GPS_SIZE);
+	Usart3.Send((u8*)&RTK_XYZ_HP_SendData.PX,RTK_GPS_SIZE);
 }
 
 void UpData(void)

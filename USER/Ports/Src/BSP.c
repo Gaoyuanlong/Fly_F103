@@ -16,7 +16,7 @@ void BSP_Init(void)
 	Os_Time.Init();
 	Usart1.Init(115200,3);
 	Usart2.Init(115200,2);
-	Usart3.Init(9600,1);
+	Usart3.Init(38400,1);
 	ADC.Init(); 
 }
 

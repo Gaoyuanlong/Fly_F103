@@ -25,20 +25,22 @@ void Show_UI(void)
 
 
 	POS.X = X;POS.Y = Y;Y++;
-	TFT.FillFloat(POS,RTK_GPS.Alt_M,WHITE,BLACK);	
+	TFT.FillFloat(POS,RTK_XYZ_HP.Heading,WHITE,BLACK);	
 	POS.X = X;POS.Y = Y;Y++;
-	TFT.FillFloat(POS,RTK_GPS.Lat_M ,WHITE,BLACK);	
+	TFT.FillFloat(POS,RTK_XYZ_HP.Pitch ,WHITE,BLACK);	
 	POS.X = X;POS.Y = Y;Y++;
-	TFT.FillFloat(POS,RTK_GPS.Lon_M ,WHITE,BLACK);	
+	TFT.FillFloat(POS,RTK_XYZ_HP.PX ,WHITE,BLACK);	
 	POS.X = X;POS.Y = Y;Y++;
-	TFT.FillFloat(POS,RTK_GPS.TrackAngle ,WHITE,BLACK);
+	TFT.FillFloat(POS,RTK_XYZ_HP.PY ,WHITE,BLACK);
 	POS.X = X;POS.Y = Y;Y++;
-	TFT.FillFloat(POS,RTK_GPS.Quality ,WHITE,BLACK);		
+	TFT.FillFloat(POS,RTK_XYZ_HP.PZ ,WHITE,BLACK);		
 	POS.X = X;POS.Y = Y;Y++;
-	TFT.FillFloat(POS,RTK_RMC.Speed ,WHITE,BLACK);	
+	TFT.FillFloat(POS,RTK_XYZ_HP.VX ,WHITE,BLACK);	
 	POS.X = X;POS.Y = Y;Y++;
-	TFT.FillChar(POS,RTK_RMC.ModeInd ,WHITE,BLACK);	
+	TFT.FillChar(POS,RTK_XYZ_HP.Quality + '0' ,WHITE,BLACK);	
 	POS.X = X;POS.Y = Y;Y++;
+//	TFT.FillFloat(POS,RTK_XYZ.VZ ,WHITE,BLACK);	
+//	POS.X = X;POS.Y = Y;Y++;
 	TFT.FillNumber(POS,Show_Test,WHITE,BLACK);
 	
 //	POS.X = X;POS.Y = Y;Y++;

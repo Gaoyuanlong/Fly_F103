@@ -5,7 +5,8 @@ BOOL RTK_Read(u8 Cmd);
 
 RTK_RMC_ RTK_RMC;
 RTK_GGA_ RTK_GGA;
-RTK_GPS_ RTK_GPS;
+//RTK_GPS_ RTK_GPS;
+RTK_XYZ_HP_ RTK_XYZ_HP;
 
 RTK_OPS_ RTK_OPS=
 {
@@ -33,26 +34,23 @@ BOOL RTK_Find_Head(const char* Str)
 
 u8 RTK_Read_Frame(const char* Str,u8* BUF)
 { 
-	u8 i = 0;
+	u16 i = 0;
 	
-	BUF[i] = Str[i];i++;
-	BUF[i] = Str[i];i++;
-	BUF[i] = Str[i];i++;
-	BUF[i] = Str[i];i++;
-	BUF[i] = Str[i];i++;
+	while(Str[i]!='\0')
+	{
+			BUF[i] = Str[i];i++;
+	}
 	
 	while(1)
 	{
 		Usart2.Recv(&BUF[i++],0,1,True);
 	
-		if((BUF[i] == '\n') && (BUF[i - 1] == '\r')) 
-			break;
-		
-		if(i == 128)
+		if((BUF[i - 1] == '\n') && (BUF[i - 2] == '\r')) 
 			break;
 	}
-	return i + 1;
+	return i;
 }
+
 
 
 double RTK_Str2Float(const u8* Str_Add)
@@ -164,31 +162,89 @@ void RTK_Extract_GgaData(const u8* BUF)
 	while(Str_Add_temp[i++] !=  ','){}
 	RTK_GGA.Alt = RTK_Str2Float(&Str_Add_temp[i]);	
 		
-	while(Str_Add_temp[i++] !=  ','){}
-	RTK_GGA.AUnits = Str_Add_temp[i];
+//	while(Str_Add_temp[i++] !=  ','){}
+//	RTK_GGA.AUnits = Str_Add_temp[i];
 
-	while(Str_Add_temp[i++] !=  ','){}
-	RTK_GGA.Undulation = RTK_Str2Float(&Str_Add_temp[i]);
+//	while(Str_Add_temp[i++] !=  ','){}
+//	RTK_GGA.Undulation = RTK_Str2Float(&Str_Add_temp[i]);
 
-	while(Str_Add_temp[i++] !=  ','){}
-	RTK_GGA.UUnits = Str_Add_temp[i];	
-		
-	while(Str_Add_temp[i++] !=  ','){}
-	RTK_GGA.Age = (u8)RTK_Str2Float(&Str_Add_temp[i]);	
-		
-	while(Str_Add_temp[i++] !=  ','){}
-	if(Str_Add_temp[i] != '*')
-	{
-		RTK_GGA.StnID[0] = Str_Add_temp[i++];	
-		RTK_GGA.StnID[1] = Str_Add_temp[i++];
-		RTK_GGA.StnID[2] = Str_Add_temp[i++];	
-		RTK_GGA.StnID[3] = Str_Add_temp[i++];	
-	}
+//	while(Str_Add_temp[i++] !=  ','){}
+//	RTK_GGA.UUnits = Str_Add_temp[i];	
+//		
+//	while(Str_Add_temp[i++] !=  ','){}
+//	RTK_GGA.Age = (u8)RTK_Str2Float(&Str_Add_temp[i]);	
+//		
+//	while(Str_Add_temp[i++] !=  ','){}
+//	if(Str_Add_temp[i] != '*')
+//	{
+//		RTK_GGA.StnID[0] = Str_Add_temp[i++];	
+//		RTK_GGA.StnID[1] = Str_Add_temp[i++];
+//		RTK_GGA.StnID[2] = Str_Add_temp[i++];	
+//		RTK_GGA.StnID[3] = Str_Add_temp[i++];	
+//	}
 }
-u8 BUF[128] = "GPRMC,125030.80,A,3853.1375121,N,12131.5780702,E,0.034,105.5,100117,0.0,E,D*3D";
+
+void RTK_Extract_H3A_Data(const u8* BUF)
+{
+	const u8* Str_Add_temp = BUF;
+	u8 i = 0;
+	
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	RTK_XYZ_HP.Heading = RTK_Str2Float(&Str_Add_temp[i]);			
+	while(Str_Add_temp[i++] !=  ','){}
+	RTK_XYZ_HP.Pitch =RTK_Str2Float(&Str_Add_temp[i]);				
+}
+
+void RTK_Extract_Bestxyz_Data(const u8* BUF)
+{
+	const u8* Str_Add_temp = BUF;
+	u8 i = 0;
+	
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){} 
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+			RTK_XYZ_HP.PX = RTK_Str2Float(&Str_Add_temp[i]);	
+	while(Str_Add_temp[i++] !=  ','){}
+			RTK_XYZ_HP.PY = RTK_Str2Float(&Str_Add_temp[i]);	
+	while(Str_Add_temp[i++] !=  ','){}
+			RTK_XYZ_HP.PZ = RTK_Str2Float(&Str_Add_temp[i]);	
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+	while(Str_Add_temp[i++] !=  ','){}
+			RTK_XYZ_HP.VX = RTK_Str2Float(&Str_Add_temp[i]);		
+	while(Str_Add_temp[i++] !=  ','){}
+			RTK_XYZ_HP.VY = RTK_Str2Float(&Str_Add_temp[i]);	
+	while(Str_Add_temp[i++] !=  ','){}
+			RTK_XYZ_HP.VZ = RTK_Str2Float(&Str_Add_temp[i]);					
+}
+
+
+
 BOOL RTK_Read_GPRMC(void)
 {
-
+u8 BUF[128] = "GPRMC,125030.80,A,3853.1375121,N,12131.5780702,E,0.034,105.5,100117,0.0,E,D*3D";
 	u8 Sum = 0;
 	u8 Length = 0;
 	
@@ -197,7 +253,7 @@ BOOL RTK_Read_GPRMC(void)
 
 	for(u8 i = 0;i < Length - 5;i++)
 	{
-		Sum ^= BUF[i];
+		Sum ^= BUF[i]; 
 	}	
 
 	Sum -= (u8)(BUF[Length - 4] << 4);
@@ -213,21 +269,21 @@ BOOL RTK_Read_GPRMC(void)
 
 BOOL RTK_Read_GPGGA(void)
 {
-	u8 BUF[128] = "GPGGA,125030.80,3853.1375121,N,12131.5780702,E,4,22,0.7,26.043,M,8.02,M,00,0001*5B";
+	u8 BUF[256] = "GPGGA,125030.80,3853.1375121,N,12131.5780702,E,4,22,0.7,26.043,M,8.02,M,00,0001*5B";
 	u8 Sum = 0;
 	u8 Length = 0;
 	
 	RTK_Find_Head("$GPGGA");
 	Length = RTK_Read_Frame("GPGGA",BUF);
 
-	for(u8 i = 0;i < Length - 5;i++)
-	{
-		Sum ^= BUF[i];
-	}	
+//	for(u8 i = 0;i < Length - 5;i++)
+//	{
+//		Sum ^= BUF[i];
+//	}
 
-	Sum -= (u8)(BUF[Length - 4] << 4);
-	Sum -= (u8)(BUF[Length - 3] & 0X0F);
-	
+//	Sum -= (u8)(BUF[Length - 4] << 4);
+//	Sum -= (u8)(BUF[Length - 3] & 0X0F);
+
 	if(1)
 	{
 		RTK_Extract_GgaData(BUF);
@@ -236,6 +292,55 @@ BOOL RTK_Read_GPGGA(void)
 	return False;
 }
 
+BOOL RTK_Read_H3A(void)
+{
+	u8 BUF[256] = "HEADING3A,COM1,0,23.5,FINESTEERING,1938,393220.800,00000000,d3de,13950;SOL_COMPUTED,NARROW_INT,-1.000000000,87.855598450,-0.305908203,0.200,0.734298646,1.390366435,\"Z40N\",16,16,16,12,04,01,30,13*eaa71227";
+	u8 Sum = 0;
+	u8 Length = 0;
+	
+	RTK_Find_Head("#HEADING3A");
+	Length = RTK_Read_Frame("HEADING3A",BUF);
+
+//	//未加校验
+//	for(u8 i = 0;i < Length - 9;i++)
+//	{
+//		Sum ^= BUF[i];
+//	}
+//	Sum -= (u8)(BUF[Length - 4] << 4);
+//	Sum -= (u8)(BUF[Length - 3] & 0X0F);
+
+	if(1)
+	{
+		RTK_Extract_H3A_Data(BUF);
+		return True;
+	}
+	return False;
+}
+
+BOOL RTK_Read_Bestxyz(void)
+{
+	u8 BUF[256] = "BESTXYZA,COM1,0,27.0,FINESTEERING,1938,393384.600,00000000,fac1,13950;SOL_COMPUTED,NARROW_INT,-2599458.5359,4237567.5699,3982464.7609,0.0143,0.0220,0.0179,SOL_COMPUTED,NARROW_INT,0.1992,0.0505,-0.0089,0.0131,0.0203,0.0147";
+	u8 Sum = 0;
+	u8 Length = 0;
+	
+	RTK_Find_Head("#BESTXYZA");
+	Length = RTK_Read_Frame("BESTXYZA",BUF);
+
+//	//未加校验
+//	for(u8 i = 0;i < Length - 9;i++)
+//	{
+//		Sum ^= BUF[i];
+//	}
+	Sum -= (u8)(BUF[Length - 4] << 4);
+	Sum -= (u8)(BUF[Length - 3] & 0X0F);
+
+	if(1)
+	{
+		RTK_Extract_Bestxyz_Data(BUF);
+		return True;
+	}
+	return False;
+}
 /*
 		设第一点A的经 纬度为(LonA, LatA)，第二点B的经纬度为(LonB, LatB)，
 		按照0度经线的基准，东经取经度的正值(Longitude)，西经取经度负值(-Longitude)，
@@ -257,6 +362,11 @@ BOOL RTK_Read_GPGGA(void)
 		弧长公式
 		l = n（圆心角）× π（圆周率）× r（半径）/180=α(圆心角弧度数)× r（半径）
 */
+float To_180_degrees(float x)
+{
+	return (x>180?(x-360):(x<-180?(x+360):x));
+}
+
 void RTK_Unit_Convert(void)
 {
 	#define EARTH_RADIUS 6371393
@@ -277,19 +387,13 @@ void RTK_Unit_Convert(void)
 	if(RTK_GGA.Lat == 'S')
 		Lat_Deg = -Lat_Deg;
 	
-	RTK_GPS.Lon_M = (Lon_Deg*PI/180)*EARTH_RADIUS;		//经度 单位米	GGA
-	RTK_GPS.Lat_M = (Lat_Deg*PI/180)*EARTH_RADIUS;		//纬度 单位米	GGA
+	RTK_XYZ_HP.Lon_M = (Lon_Deg*PI/180)*EARTH_RADIUS;		//经度 单位米	GGA
+	RTK_XYZ_HP.Lat_M = (Lat_Deg*PI/180)*EARTH_RADIUS;		//纬度 单位米	GGA
+	RTK_XYZ_HP.Alt_M = RTK_GGA.Alt; 											//相对海平面高度 单位米	GGA
 
-	RTK_GPS.Alt_M = RTK_GGA.Alt; 											//相对海平面高度 单位米	GGA
+	RTK_XYZ_HP.Heading = To_180_degrees(RTK_XYZ_HP.Heading);//角度0*360转换为-180*180
 	
-	if(RTK_RMC.MagDir == 'W')
-		RTK_GPS.TrackAngle = -RTK_RMC.TrackAngle;						//航迹角 单位度	RMC
-	else if(RTK_RMC.MagDir == 'E')
-		RTK_GPS.TrackAngle = RTK_RMC.TrackAngle;
-	
-	RTK_GPS.Quality = RTK_GGA.Quality-'0';						//定位质量	GGA
-	RTK_GPS.Speed_M = RTK_RMC.Speed;									//移动速度 单位米	RMC
-	
+	RTK_XYZ_HP.Quality = RTK_GGA.Quality-'0';						//定位质量	GGA
 }
 
 void RTK_Init(void)
@@ -300,8 +404,11 @@ void RTK_Init(void)
 
 BOOL RTK_Read(u8 Cmd)
 {
-  RTK_Read_GPRMC();
+//  RTK_Read_GPRMC();
 	RTK_Read_GPGGA();
+	RTK_Read_H3A();
+//	RTK_Read_Bestxyz();
+	
 	RTK_Unit_Convert();
 	return True;
 }

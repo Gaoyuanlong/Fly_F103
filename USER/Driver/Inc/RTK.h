@@ -48,6 +48,25 @@ typedef struct RTK_GPS_
 	double Speed_M;
 }RTK_GPS_;
 
+typedef struct RTK_XYZ_HP_
+{
+	double PX;
+	double PY;
+	double PZ;
+	
+	double VX;
+	double VY;
+	double VZ;
+	
+	double Heading;
+	double Pitch; 
+	
+	double Lon_M;
+	double Lat_M;
+	double Alt_M;
+	u8 Quality;
+}RTK_XYZ_HP_;
+
 typedef struct RTK_OPS_
 {
 	void (*Init)(void);
@@ -57,6 +76,7 @@ typedef struct RTK_OPS_
 
 extern RTK_RMC_ RTK_RMC;
 extern RTK_GGA_ RTK_GGA;
-extern RTK_GPS_ RTK_GPS;
+//extern RTK_GPS_ RTK_GPS;
 extern RTK_OPS_ RTK_OPS;
+extern RTK_XYZ_HP_ RTK_XYZ_HP;
 #endif

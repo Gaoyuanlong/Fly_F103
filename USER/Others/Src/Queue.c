@@ -1,6 +1,6 @@
 #include "Queue.h"
 
-Queue_ Inqueue(u8 Size,u8* P);
+Queue_ Inqueue(u16 Size,u8* P);
 BOOL Enqueue(u8  Byte,Queue_* Aim);
 BOOL Dequeue(u8* Byte,Queue_* Aim);
 
@@ -12,7 +12,7 @@ Queue_OPS_ Queue_OPS =
 	Dequeue
 };
 
-Queue_ Inqueue(u8  Size,u8* P)
+Queue_ Inqueue(u16  Size,u8* P)
 {
 	Queue_ Aim;
 	
@@ -30,7 +30,7 @@ Queue_ Inqueue(u8  Size,u8* P)
 //Write
 BOOL Enqueue(u8 Byte,Queue_* Aim)
 {
-	u8 Tmp = 0;
+	u16 Tmp = 0;
 	if(Aim->IsFull == False)
 	{
 		Aim->Length++;
@@ -51,7 +51,7 @@ BOOL Enqueue(u8 Byte,Queue_* Aim)
 //Read
 BOOL Dequeue(u8* Byte,Queue_* Aim)
 {
-	u8 Tmp = 0;
+	u16 Tmp = 0;
 	if(Aim->IsEmpty == False)
 	{
 		Aim->Length--;

@@ -67,13 +67,13 @@ BOOL Para_Updata(void)
 {
 	static u8 cnt = 0;
 	
-	Para.Data->Data1 = GPS_Send_Data.Alt_M;
-	Para.Data->Data2 = GPS_Send_Data.Lat_M;
-	Para.Data->Data3 = GPS_Send_Data.Lon_M;
-	Para.Data->Data4 = GPS_Send_Data.TrackAngle;
-	Para.Data->Data5 = GPS_Send_Data.Speed_M;
-	Para.Data->Data6 = GPS_Send_Data.Quality;
-	Para.Data->Data7 =  RTK_RMC.ModeInd;
+//	Para.Data->Data1 = GPS_Send_Data.Alt_M;
+//	Para.Data->Data2 = GPS_Send_Data.Lat_M;
+//	Para.Data->Data3 = GPS_Send_Data.Lon_M;
+//	Para.Data->Data4 = GPS_Send_Data.TrackAngle;
+//	Para.Data->Data5 = GPS_Send_Data.Speed_M;
+//	Para.Data->Data6 = GPS_Send_Data.Quality;
+//	Para.Data->Data7 =  RTK_RMC.ModeInd;
 	
 	if(RTK_RMC.ModeInd != 'N')
 	{
